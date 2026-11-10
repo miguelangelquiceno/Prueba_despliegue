@@ -1,15 +1,10 @@
-when:
-  - event: push
-    branch: main
 
 steps:
-  - name: prueba
+  prueba:
     image: alpine:3.21
     commands:
-      - echo "================================"
-      - echo "Woodpecker CI funcionando"
-      - echo "Repositorio: $CI_REPO"
-      - echo "Rama: $CI_COMMIT_BRANCH"
-      - echo "Commit: $CI_COMMIT_SHA"
-      - echo "Despliegue de prueba completado"
-      - echo "================================"
+      - "echo Woodpecker CI funcionando"
+      - "echo Repositorio: $CI_REPO"
+      - "echo Rama: $CI_COMMIT_BRANCH"
+      - "echo Commit: $CI_COMMIT_SHA"
+      - "echo Despliegue de prueba completado"
