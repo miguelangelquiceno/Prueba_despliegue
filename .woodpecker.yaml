@@ -1,13 +1,12 @@
-
 steps:
-  prueba:
+  despliegue:
     image: alpine:3.21
     commands:
-      - "echo Woodpecker CI funcionando"
-      - "echo Repositorio: $CI_REPO"
-      - "echo Rama: $CI_COMMIT_BRANCH"
-      - "echo Commit: $CI_COMMIT_SHA"
-      - "echo Despliegue de prueba completado"
+      - "find /deploy -mindepth 1 -maxdepth 1 -exec rm -rf {} +"
+      - "cp -a sitio/. /deploy/"
+      - "echo Despliegue completado correctamente"
+    volumes:
+      - woodpecker-production:/deploy
     when:
       - event: push
         branch: main
