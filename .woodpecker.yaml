@@ -8,3 +8,6 @@ steps:
       - "echo Rama: $CI_COMMIT_BRANCH"
       - "echo Commit: $CI_COMMIT_SHA"
       - "echo Despliegue de prueba completado"
+    when:
+      - event: push
+        branch: main
