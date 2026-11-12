@@ -1,0 +1,45 @@
+# Despliegue por SSH (modelo NO trusted) para Woodpecker CI v3
+# Guardar en el repo como: .woodpecker/cd.yaml
+#
+# Este workflow NO monta volúmenes ni usa 'trusted': solo usa plugins con 'settings'
+# y la llave privada llega desde un secreto de Woodpecker (from_secret).
+#
+# ETAPA 1 (probar solo SSH): deja 'depends_on' comentado y mueve ci.yaml fuera de .woodpecker/.
+# ETAPA 2 (integrar con ci): descomenta 'depends_on' y devuelve ci.yaml a .woodpecker/.
+
+# Prueba local: el despliegue se dispara al hacer push a main.
+# Los secretos de Woodpecker no se exponen a eventos pull_request por defecto,
+# por eso este workflow NO se activa con pull_request.
+when:
+  - event: push
+    branch: main
+
+# ETAPA 2: el despliegue espera a que el workflow 'ci' termine con éxito
+# (el nombre es el del archivo sin extensión: ci.yaml -> ci).
+# depends_on:
+#   - ci
+
+steps:
+  - name: copiar-sitio
+    image: appleboy/drone-scp
+    settings:
+      host: host.docker.internal   # el contenedor ssh-target publica el puerto 2222 en tu PC
+      port: 2222
+      username: deploy
+      key:
+        from_secret: ssh_key       # secreto creado en la interfaz de Woodpecker
+      target: /site                # carpeta del volumen que sirve nginx
+      source: sitio/*              # archivos del repo a copiar
+      strip_components: 1          # quita el prefijo "sitio/" al copiar
+      # fingerprint: SHA256:...    # recomendado antes de producción (ver guía)
+
+  - name: verificar
+    image: appleboy/drone-ssh
+    settings:
+      host: host.docker.internal
+      port: 2222
+      username: deploy
+      key:
+        from_secret: ssh_key
+      script:
+        - ls -la /site
